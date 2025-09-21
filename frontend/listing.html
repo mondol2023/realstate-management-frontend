@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Listing Details </title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">Realstate Management</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="listings.html">Listings</a></li>
+      <li><a href="login.html">Login</a></li>
+      <li><a href="register.html">Register</a></li>
+    </ul>
+  </nav>
+
+  <main class="listing-details">
+    <div id="listingContent"></div>
+  </main>
+
+  <script>
+    function fetchListing() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get("id");
+
+            if (!id) {
+                document.getElementById("listingContent").innerHTML = "<h2>Listing not found.</h2>";
+                return;
+            };
+
+            const listings = JSON.parse(localStorage.getItem("listings")) || [];
+            const listing = listings.find(l => l._id === id);
+
+            if (!listing) {
+                document.getElementById("listingContent").innerHTML = "<h2>Listing not found.</h2>";
+                return;
+            }
+            
+            const container = document.getElementById("listingContent");
+            container.innerHTML = `
+                <img src="${listing.image || 'https://via.placeholder.com/600'}" alt="${listing.title}" class="listing-img">
+                <h2>${listing.title}</h2>
+                <p><strong>Location:</strong> ${listing.location}</p>
+                <p><strong>Price:</strong> $${listing.price} / night</p>
+                <p>${listing.description || "No description available."}</p>
+                <a href="booking.html?id=${listing._id}" class="btn">Book Now</a>
+            `;
+        }
+
+        fetchListing();
+
+      
+      document.addEventListener("DOMContentLoaded", () => {
+          const navLinks = document.querySelector(".nav-links");
+          const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+          if (currentUser) {
+              navLinks.innerHTML = `
+                  <li><a href="index.html">Home</a></li>
+                  <li><a href="listings.html">Listings</a></li>
+                  <li><a href="dashboard.html">Dashboard</a></li>
+                  <li><a href="#" onclick="logout()">Logout</a></li>
+              `;
+          } else {
+              navLinks.innerHTML = `
+                  <li><a href="index.html">Home</a></li>
+                  <li><a href="listings.html">Listings</a></li>
+                  <li><a href="login.html">Login</a></li>
+                  <li><a href="register.html">Register</a></li>
+              `;
+          }
+      });
+
+      function logout() {
+          sessionStorage.removeItem("currentUser");
+          window.location.href = "index.html";
+      }
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Register </title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <nav class="navbar">
+            <div class="logo">RealState Management</div>
+            <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html" class="active">Register</a></li>
+            </ul>
+        </nav>
+
+        <main class="auth-container">
+            <h2>Register</h2>
+            <form id="registerForm" class="auth-form">
+                <label>Username</label>
+                <input type="text" id="username" required>
+
+                <label>Email</label>
+                <input type="email" id="email" required>
+
+                <label>Password</label>
+                <input type="password" id="password" required>
+
+                <button type="submit" class="btn">Register</button>
+                <p class="switch-auth">
+                    Already have an account? <a href="login.html">Login</a>
+                </p>
+            </form>
+        </main>
+
+        <script>
+            document.getElementById("registerForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const username = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            const users = JSON.parse(localStorage.getItem("users")) || [];
+
+            const existingUser = users.find(user => user.email === email);
+            if (existingUser) {
+                alert("An account with this email already exists.");
+                return;
+            }
+            const newUser = {
+                id: `user_${Date.now()}`,
+                username,
+                email,
+                password, 
+                role: "user"
+            };
+
+            
+            users.push(newUser);
+
+            
+            localStorage.setItem("users", JSON.stringify(users));
+
+            alert("Registration successful!");
+            window.location.href = "login.html";
+            });
+        </script>
+    </body>
+</html>

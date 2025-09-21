@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel </title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo"> Admin</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="admin.html" class="active">Admin Panel</a></li>
+      <li><a href="logout.html">Logout</a></li>
+    </ul>
+  </nav>
+
+  <main class="admin-container">
+    <h2>Admin Dashboard</h2>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="users">Users</button>
+      <button class="tab-btn" data-tab="listings">Listings</button>
+      <button class="tab-btn" data-tab="bookings">Bookings</button>
+    </div>
+
+    <div id="users" class="tab-content active">
+      <h3>All Users</h3>
+      <table id="usersTable" class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="listings" class="tab-content">
+      <h3>All Listings</h3>
+      <table id="listingsTable" class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th><th>Title</th><th>Location</th><th>Host</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="bookings" class="tab-content">
+      <h3>All Bookings</h3>
+      <table id="bookingsTable" class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th><th>User</th><th>Listing</th><th>Dates</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".tab-btn, .tab-content").forEach(el => el.classList.remove("active"));
+                btn.classList.add("active");
+                document.getElementById(btn.dataset.tab).classList.add("active");
+            });
+        });
+
+        const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+        if (!currentUser || currentUser.role !== 'admin') {
+            alert("Access Denied. You must be an admin to view this page.");
+            window.location.href = "login.html";
+        }
+        
+      
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+            sessionStorage.removeItem("currentUser");
+            window.location.href = "login.html";
+        });
+
+        function fetchUsers() {
+            const users = JSON.parse(localStorage.getItem("users")) || [];
+            const tbody = document.querySelector("#usersTable tbody");
+            tbody.innerHTML = "";
+            users.forEach(user => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${user.id}</td><td>${user.username}</td><td>${user.email}</td><td>${user.role}</td>
+                    <td><button onclick="deleteUser('${user.id}')">Delete</button></td>
+                </tr>`;
+            });
+        }
+        function deleteUser(id) {
+            if (!confirm("Are you sure you want to delete this user?")) return;
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+            users = users.filter(user => user.id !== id);
+            localStorage.setItem("users", JSON.stringify(users));
+            fetchUsers(); 
+        }
+
+
+        function fetchListings() {
+            const listings = JSON.parse(localStorage.getItem("listings")) || [];
+            const tbody = document.querySelector("#listingsTable tbody");
+            tbody.innerHTML = "";
+            listings.forEach(listing => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${listing._id}</td><td>${listing.title}</td><td>${listing.location}</td>
+                    <td>${listing.host?.name || "N/A"}</td>
+                    <td><button onclick="deleteListing('${listing._id}')">Delete</button></td>
+                </tr>`;
+            });
+        }
+        function deleteListing(id) {
+            if (!confirm("Delete this listing?")) return;
+            let listings = JSON.parse(localStorage.getItem("listings")) || [];
+            listings = listings.filter(l => l._id !== id);
+            localStorage.setItem("listings", JSON.stringify(listings));
+            fetchListings(); 
+        }
+
+
+        function fetchBookings() {
+            const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+            const listings = JSON.parse(localStorage.getItem("listings")) || [];
+            const tbody = document.querySelector("#bookingsTable tbody");
+            tbody.innerHTML = "";
+            bookings.forEach(booking => {
+                const listing = listings.find(l => l._id === booking.listingId);
+                const listingTitle = listing ? listing.title : "N/A";
+                
+                tbody.innerHTML += `
+                <tr>
+                    <td>${booking._id}</td>
+                    <td>${booking.user?.name || "N/A"}</td>
+                    <td>${listingTitle}</td>
+                    <td>${new Date(booking.checkIn).toLocaleDateString()} - ${new Date(booking.checkOut).toLocaleDateString()}</td>
+                    <td>${booking.paymentStatus}</td>
+                </tr>`;
+            });
+        }
+
+        
+        fetchUsers();
+        fetchListings();
+        fetchBookings();
+  </script>
+</body>
+</html>

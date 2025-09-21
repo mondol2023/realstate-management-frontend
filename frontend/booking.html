@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Listing </title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">Realstate Management</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="listings.html">Listings</a></li>
+      <li><a href="login.html">Login</a></li>
+      <li><a href="register.html">Register</a></li>
+    </ul>
+  </nav>
+
+  <main class="booking-container">
+    <h2>Book Your Stay</h2>
+    <form id="bookingForm" class="booking-form">
+      <input type="hidden" id="listingId">
+
+      <label>Check-in Date</label>
+      <input type="date" id="checkIn" required>
+
+      <label>Check-out Date</label>
+      <input type="date" id="checkOut" required>
+
+      <label>Number of Guests</label>
+      <input type="number" id="guests" min="1" required>
+
+      <button type="submit" class="btn">Confirm Booking</button>
+    </form>
+  </main>
+
+  <script>
+    
+    const params = new URLSearchParams(window.location.search);
+        const listingId = params.get("id");
+        if (listingId) document.getElementById("listingId").value = listingId;
+
+        document.getElementById("bookingForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+            if (!currentUser) {
+                alert("You must be logged in to make a booking.");
+                window.location.href = "login.html";
+                return;
+            }
+
+            const newBooking = {
+                _id: `booking_${Date.now()}`,
+                listingId: listingId,
+                userId: currentUser.id,
+                user: { name: currentUser.username, email: currentUser.email }, 
+                checkIn: document.getElementById("checkIn").value,
+                checkOut: document.getElementById("checkOut").value,
+                guests: document.getElementById("guests").value,
+                paymentStatus: "pending"
+            };
+
+            const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+            bookings.push(newBooking);
+            localStorage.setItem("bookings", JSON.stringify(bookings));
+
+            alert("Booking details saved! Please proceed to payment.");
+            window.location.href = `payment.html?bookingId=${newBooking._id}`;
+        });
+
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            const navLinks = document.querySelector(".nav-links");
+            const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+            if (currentUser) {
+                
+                navLinks.innerHTML = `
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="listings.html">Listings</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="#" onclick="logout()">Logout</a></li>
+                `;
+            } else {
+                
+                navLinks.innerHTML = `
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="listings.html">Listings</a></li>
+                    <li><a href="login.html">Login</a></li>
+                    <li><a href="register.html">Register</a></li>
+                `;
+            }
+        });
+
+        function logout() {
+            sessionStorage.removeItem("currentUser");
+            window.location.href = "index.html";
+        }
+  </script>
+</body>
+</html>

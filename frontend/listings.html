@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Listings </title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">Realstate Management</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="listings.html" class="active">Listings</a></li>
+      <li><a href="login.html">Login</a></li>
+      <li><a href="register.html">Register</a></li>
+    </ul>
+  </nav>
+
+  <main class="listings-container">
+    <h2>Available Listings</h2>
+    <div id="listingsGrid" class="listings-grid"></div>
+  </main>
+
+  <script>
+    function fetchListings() {
+            const listings = JSON.parse(localStorage.getItem("listings")) || [];
+            const listingsGrid = document.getElementById("listingsGrid");
+            listingsGrid.innerHTML = "";
+
+            if (listings.length === 0) {
+                listingsGrid.innerHTML = "<p>No listings available at the moment.</p>";
+                return;
+            }
+
+            listings.forEach(listing => {
+            const card = document.createElement("div");
+            card.className = "listing-card";
+            card.innerHTML = `
+                <img src="${listing.image || 'https://via.placeholder.com/300'}" alt="${listing.title}">
+                <h3>${listing.title}</h3>
+                <p>${listing.location}</p>
+                <p><strong>$${listing.price}</strong> / night</p>
+                <a href="listing.html?id=${listing._id}" class="btn">View Details</a>
+            `;
+            listingsGrid.appendChild(card);
+            });
+        }
+
+        fetchListings();
+
+        
+      document.addEventListener("DOMContentLoaded", () => {
+          const navLinks = document.querySelector(".nav-links");
+          const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+          if (currentUser) {
+              navLinks.innerHTML = `
+                  <li><a href="index.html">Home</a></li>
+                  <li><a href="listings.html">Listings</a></li>
+                  <li><a href="dashboard.html">Dashboard</a></li>
+                  <li><a href="#" onclick="logout()">Logout</a></li>
+              `;
+          } else {
+              navLinks.innerHTML = `
+                  <li><a href="index.html">Home</a></li>
+                  <li><a href="listings.html">Listings</a></li>
+                  <li><a href="login.html">Login</a></li>
+                  <li><a href="register.html">Register</a></li>
+              `;
+          }
+      });
+
+      function logout() {
+          sessionStorage.removeItem("currentUser");
+          window.location.href = "index.html";
+      }
+  </script>
+</body>
+</html>

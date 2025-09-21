@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">RealState Management</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="listings.html">Listings</a></li>
+            <li><a href="dashboard.html" class="active">Dashboard</a></li>
+            <li><a href="#" id="logoutBtn">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <h2 id="welcomeMessage">Welcome!</h2>
+        <p>Here you can view and manage your property bookings.</p>
+        
+        <div class="content-section">
+            <h3>My Bookings</h3>
+            <table id="bookingsTable" class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Listing Title</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Guests</th>
+                        <th>Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+            <p id="noBookingsMessage" style="display: none;">You have no bookings yet.</p>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+           
+            const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+
+            if (!currentUser) {
+               
+                alert("Please log in to view the dashboard.");
+                window.location.href = "login.html";
+                return; 
+            }
+            
+          
+            document.getElementById("welcomeMessage").textContent = `Welcome, ${currentUser.username}!`;
+
+            
+            const allBookings = JSON.parse(localStorage.getItem("bookings")) || [];
+            const allListings = JSON.parse(localStorage.getItem("listings")) || [];
+            
+          
+            const userBookings = allBookings.filter(booking => booking.userId === currentUser.id);
+
+            const bookingsTbody = document.querySelector("#bookingsTable tbody");
+            
+            if (userBookings.length > 0) {
+                userBookings.forEach(booking => {
+                    
+                    const listingDetails = allListings.find(l => l._id === booking.listingId);
+                    const listingTitle = listingDetails ? listingDetails.title : "Listing Not Found";
+
+                    const row = `
+                        <tr>
+                            <td>${listingTitle}</td>
+                            <td>${new Date(booking.checkIn).toLocaleDateString()}</td>
+                            <td>${new Date(booking.checkOut).toLocaleDateString()}</td>
+                            <td>${booking.guests}</td>
+                            <td><span class="status-${booking.paymentStatus.toLowerCase()}">${booking.paymentStatus}</span></td>
+                        </tr>
+                    `;
+                    bookingsTbody.innerHTML += row;
+                });
+            } else {
+              
+                document.getElementById("noBookingsMessage").style.display = "block";
+            }
+
+
+            
+            document.getElementById("logoutBtn").addEventListener("click", (e) => {
+                e.preventDefault();
+                
+                sessionStorage.removeItem("currentUser");
+                alert("You have been logged out.");
+               
+                window.location.href = "index.html";
+            });
+        });
+    </script>
+</body>
+</html>

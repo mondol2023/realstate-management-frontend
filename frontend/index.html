@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Realstate Management</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+ 
+  <div class="navbar">
+    <h2>RealState Management</h2>
+    <ul class="menu">
+        <li><a href="index.html"><i class="fa-solid fa-home"></i> Home</a></li>
+        <li><a href="listings.html"><i class="fa-solid fa-list-ul"></i> Listings</a></li>
+        <li><a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a></li>
+        <li><a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a></li>
+        <li><a href="dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+    </ul>
+        
+  </div>
+  
+  <section class="hero">
+    <div class="container">
+      <h2>Find your next stay</h2>
+      <form id="search-form">
+        <input type="text" id="search-input" placeholder="Search location..." />
+        <button type="submit">Search</button>
+      </form>
+    </div>
+  </section>
+
+ 
+  <main class="container">
+    <h2>Available Listings</h2>
+    <div id="listings" class="grid"></div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/listings.js"></script>
+</body>
+</html>
